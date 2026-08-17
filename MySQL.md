@@ -66,3 +66,17 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON snippetbox.* TO 'abc'@'localhost';
 Logout from current User: `exit`.\
 Login to database `snippetbox` from that User: `mysql -D snippetbox -u abc -p` => type password `1234`.\
 Read data from a table: `SELECT id, title, expires FROM snippets` 
+
+## Session on Server side
+Create `sessions` table
+```sh
+USE snippetbox;
+
+CREATE TABLE sessions (
+  token CHAR(43) PRIMARY KEY,
+  data BLOB NOT NULL,
+  expiry TIMESTAMP(6) NOT NULL
+);
+
+CREATE INDEX sessions_expiry_idx ON sessions (expiry);
+```

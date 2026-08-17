@@ -37,6 +37,11 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 // View 1 Snippet
 func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil || id < 1 {
+		http.NotFound(w, r)
+		return
+	}
+
 	// GET Snippet with that ID
 	snippet, err := app.snippets.Get(id)
 	if err != nil {
@@ -49,7 +54,7 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create template data to render, with Snippet & current Year
-	data := app.newTemplateData(r)
+	data := app.newTemplateData(r) // "Flash" already inside
 	data.Snippet = snippet
 
 	app.render(w, r, http.StatusOK, "view.html", data)
@@ -100,6 +105,9 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 		app.serverError(w, r, err)
 		return
 	}
+
+	// Put {"flash": "xxxx"} to Session data
+	app.sessionManager.Put(r.Context(), "flash", "Snippet successfully created!")
 
 	// return Client to relevant page
 	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)

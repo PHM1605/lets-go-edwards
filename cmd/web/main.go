@@ -8,7 +8,10 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"time"
 
+	"github.com/alexedwards/scs/mysqlstore"
+	"github.com/alexedwards/scs/v2"
 	"github.com/go-playground/form"
 	_ "github.com/go-sql-driver/mysql" // only to call init() inside
 )
@@ -16,10 +19,11 @@ import (
 // Dependency injection - to make "logger" global
 // Next step: put all Handlers as Methods of this struct; so that "logger"/"snippets" are visible to them
 type application struct {
-	logger        *slog.Logger
-	snippets      *models.SnippetModel
-	templateCache map[string]*template.Template
-	formDecoder   *form.Decoder
+	logger         *slog.Logger
+	snippets       *models.SnippetModel
+	templateCache  map[string]*template.Template
+	formDecoder    *form.Decoder
+	sessionManager *scs.SessionManager
 }
 
 // dsn: Data Source Name (Connection String)
@@ -69,11 +73,17 @@ func main() {
 	// Initialize a Form Decoder
 	formDecoder := form.NewDecoder()
 
+	// Setup Session Manager
+	sessionManager := scs.New()
+	sessionManager.Store = mysqlstore.New(db) // Session Manager will use MySQL on Server to store Sessions
+	sessionManager.Lifetime = 12 * time.Hour  // Session will expire after 12 hours
+
 	app := &application{
-		logger:        logger,
-		snippets:      &models.SnippetModel{DB: db},
-		templateCache: templateCache,
-		formDecoder:   formDecoder,
+		logger:         logger,
+		snippets:       &models.SnippetModel{DB: db},
+		templateCache:  templateCache,
+		formDecoder:    formDecoder,
+		sessionManager: sessionManager,
 	}
 
 	logger.Info("starting server", slog.String("addr", *addr))

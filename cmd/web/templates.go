@@ -13,6 +13,7 @@ type templateData struct {
 	Snippet     models.Snippet
 	Snippets    []models.Snippet
 	Form        any // map[string]string of Validation Errors OR form data
+	Flash       string
 }
 
 // NOTE: to pass Functions to Template

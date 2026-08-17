@@ -99,3 +99,10 @@ title := r.Form.Get("title") // for both GET and POST request
 ```sh
 go get github.com/go-playground/form
 ```
+
+## Session - scs will store sessions in Server side (MySQL)
+Install libraries
+```sh
+go get github.com/alexedwards/scs/v2
+go get github.com/alexedwards/scs/mysqlstore
+```
