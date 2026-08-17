@@ -79,3 +79,23 @@ Create ONE `sql.DB` object, which is a **pool of many connections**.\
 ### Create a new Snippet
 With `curl POST` request: `curl -iL -d "" http://localhost:4000/snippet/create`.\
 Check if DB inserts that new entry: `SELECT id, title, expires FROM snippets;`.
+
+## To handle middleware chains
+```sh
+go get github.com/justinas/alice
+```
+
+## To get GET request's parameters
+```sh
+title := r.URL.Query().Get("title")
+```
+
+## To get parameters from BOTH GET and POST requests
+```sh
+title := r.Form.Get("title") // for both GET and POST request
+```
+
+## To install & use automatic form parser
+```sh
+go get github.com/go-playground/form
+```

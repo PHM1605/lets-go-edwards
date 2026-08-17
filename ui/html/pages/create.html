@@ -1,0 +1,39 @@
+{{define "title"}}Create a New Snippet{{end}}
+
+{{define "main"}}
+<form action='/snippet/create' method='POST'>
+  <div>
+    <label>Title:</label>
+    <!-- This red line only appears when .Form.FieldErrors.title is not empty -->
+    {{with .Form.FieldErrors.title}}
+      <label class="error">{{.}}</label>
+    {{end}}
+    <input type="text" name="title" value="{{.Form.Title}}">
+  </div>
+  
+  <div>
+    <label>Content:</label>
+    <!-- This red line only appears when .Form.FieldErrors.content is not empty -->
+     {{with .Form.FieldErrors.content}}
+      <label class="error">{{.}}</label>
+     {{end}}
+    <textarea name="content">{{.Form.Content}}</textarea>
+  </div>
+  
+  <div>
+    <label>Delete in:</label>
+    <!-- This red line only appears when .Form.FieldErrors.expires is not empty -->
+     {{with .Form.FieldErrors.expires}}
+      <label class="error">{{.}}</label>
+     {{end}}
+     <!-- if Form data returns 365 (i.e. we choose "365" when submitting the form) => checking that button -->
+    <input type="radio" name="expires" value="365" {{if (eq .Form.Expires 365)}}checked{{end}}> One Year
+    <input type="radio" name="expires" value="7" {{if (eq .Form.Expires 7)}}checked{{end}}> One Week
+    <input type="radio" name="expires" value="1" {{if (eq .Form.Expires 1)}}checked{{end}}> One Day
+  </div>
+  
+  <div>
+    <input type="submit" value="Publish snippet">
+  </div>
+</form>
+{{end}}

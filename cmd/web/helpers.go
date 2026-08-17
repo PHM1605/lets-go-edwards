@@ -2,9 +2,12 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/go-playground/form"
 )
 
 // to log Error and return Server Error Response
@@ -49,4 +52,25 @@ func (app *application) newTemplateData(r *http.Request) templateData {
 	return templateData{
 		CurrentYear: time.Now().Year(),
 	}
+}
+
+// Decode request to get information from Form => parsing to "dst"
+func (app *application) decodePostForm(r *http.Request, dst any) error {
+	err := r.ParseForm()
+	if err != nil {
+		return err
+	}
+	// Parsing to "dst"
+	err = app.formDecoder.Decode(dst, r.PostForm)
+	if err != nil {
+		// if "dst" is "nil" => Decode() will return an "*InvalidDecoderError" here
+		var invalidDecoderError *form.InvalidDecoderError
+		if errors.As(err, &invalidDecoderError) {
+			panic(err)
+		}
+		// "dst" is not "nil"; error due to Bad Request
+		return err
+	}
+	// All good
+	return nil
 }
