@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/go-playground/form"
+	"github.com/justinas/nosurf"
 )
 
 // to log Error and return Server Error Response
@@ -42,6 +43,9 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, status in
 		return
 	}
 
+	// // Deliberate error
+	// w.Header().Set("Content-Length", "this isn't an integer")
+
 	// write Header
 	w.WriteHeader(status)
 	// write to Client
@@ -52,7 +56,9 @@ func (app *application) newTemplateData(r *http.Request) templateData {
 	return templateData{
 		CurrentYear: time.Now().Year(),
 		// NEW: every page will check a flash message from Request
-		Flash: app.sessionManager.PopString(r.Context(), "flash"),
+		Flash:           app.sessionManager.PopString(r.Context(), "flash"),
+		IsAuthenticated: app.isAuthenticated(r),
+		CSRFToken:       nosurf.Token(r), // each template will have a CSRFToken
 	}
 }
 
@@ -75,4 +81,9 @@ func (app *application) decodePostForm(r *http.Request, dst any) error {
 	}
 	// All good
 	return nil
+}
+
+// Check of current Request is of Authenticated User or not
+func (app *application) isAuthenticated(r *http.Request) bool {
+	return app.sessionManager.Exists(r.Context(), "authenticatedUserID")
 }

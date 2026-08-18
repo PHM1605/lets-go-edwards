@@ -106,3 +106,22 @@ Install libraries
 go get github.com/alexedwards/scs/v2
 go get github.com/alexedwards/scs/mysqlstore
 ```
+
+## TLS
+Create TLS certificates with (in `tls` folder): 
+```sh 
+go run /opt/homebrew/Cellar/go/1.26.3/libexec/src/crypto/tls/generate_cert.go --rsa-bits=2048 --host=localhost
+```
+This will create `cert.pem` and `key.pem` files
+
+## Encryption password with `bcrypt`
+```sh
+go get golang.org/x/crypto/bcrypt@latest
+```
+
+## Add CSRF-token to a field in HTML; to prevent CSRF attack
+Install `nosurf` package
+```sh
+go get github.com/justinas/nosurf
+```
+

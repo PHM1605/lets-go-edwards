@@ -80,3 +80,19 @@ CREATE TABLE sessions (
 
 CREATE INDEX sessions_expiry_idx ON sessions (expiry);
 ```
+
+## Create `users` table
+```sh
+USE snippetbox;
+
+CREATE TABLE users (
+  id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  hashed_password CHAR(60) NOT NULL,
+  created DATETIME NOT NULL
+);
+
+ALTER TABLE users ADD CONSTRAINT users_uc_email UNIQUE (email);
+```
+Test credentials for login: `abc@gmail.com` and `12345678`

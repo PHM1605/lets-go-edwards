@@ -9,11 +9,13 @@ import (
 )
 
 type templateData struct {
-	CurrentYear int
-	Snippet     models.Snippet
-	Snippets    []models.Snippet
-	Form        any // map[string]string of Validation Errors OR form data
-	Flash       string
+	CurrentYear     int
+	Snippet         models.Snippet
+	Snippets        []models.Snippet
+	Form            any // map[string]string of Validation Errors OR form data
+	Flash           string
+	IsAuthenticated bool   // is current User authenticated?
+	CSRFToken       string // for CSRF security
 }
 
 // NOTE: to pass Functions to Template

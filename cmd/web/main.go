@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"flag"
 	"html/template"
@@ -21,6 +22,7 @@ import (
 type application struct {
 	logger         *slog.Logger
 	snippets       *models.SnippetModel
+	users          *models.UserModel
 	templateCache  map[string]*template.Template
 	formDecoder    *form.Decoder
 	sessionManager *scs.SessionManager
@@ -75,20 +77,47 @@ func main() {
 
 	// Setup Session Manager
 	sessionManager := scs.New()
+	// sessionManager.Cookie.SameSite = http.SameSiteStrictMode
 	sessionManager.Store = mysqlstore.New(db) // Session Manager will use MySQL on Server to store Sessions
 	sessionManager.Lifetime = 12 * time.Hour  // Session will expire after 12 hours
+	// Make sure User will send cookies to us only when HTTPS is used
+	sessionManager.Cookie.Secure = true
 
 	app := &application{
 		logger:         logger,
 		snippets:       &models.SnippetModel{DB: db},
+		users:          &models.UserModel{DB: db},
 		templateCache:  templateCache,
 		formDecoder:    formDecoder,
 		sessionManager: sessionManager,
 	}
 
-	logger.Info("starting server", slog.String("addr", *addr))
+	// Change default TLS config
+	tlsConfig := &tls.Config{
+		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
+		MinVersion:       tls.VersionTLS13,
+		// CipherSuites: []uint16{
+		// 	tls.TLS_AES_128_GCM_SHA256,
+		// 	tls.TLS_AES_256_GCM_SHA384,
+		// },
+	}
 
-	err = http.ListenAndServe(*addr, app.routes())
+	srv := &http.Server{
+		Addr:      *addr,
+		Handler:   app.routes(),
+		ErrorLog:  slog.NewLogLogger(logger.Handler(), slog.LevelError),
+		TLSConfig: tlsConfig,
+		// Timeouts
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		// Limit Request Header size to 0.5MB - will be add 4096 bytes more by default
+		MaxHeaderBytes: 524288,
+	}
+
+	logger.Info("starting server", "addr", srv.Addr)
+
+	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 	logger.Error(err.Error())
 	os.Exit(1)
 }
