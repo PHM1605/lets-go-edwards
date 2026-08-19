@@ -125,3 +125,10 @@ Install `nosurf` package
 go get github.com/justinas/nosurf
 ```
 
+## Build the program
+```sh
+go build -o /tmp/web ./cmd/web/
+cp -r ./tls /tmp/
+cd /tmp/
+./web
+```

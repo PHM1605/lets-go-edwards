@@ -3,7 +3,9 @@ package main
 
 import (
 	"html/template"
+	"io/fs"
 	"lets-go-edwards/internal/models"
+	"lets-go-edwards/ui"
 	"path/filepath"
 	"time"
 )
@@ -34,24 +36,20 @@ var functions = template.FuncMap{
 // map "name of template" and that Template
 func newTemplateCache() (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}
-	pages, err := filepath.Glob("./ui/html/pages/*.html")
+	pages, err := fs.Glob(ui.Files, "html/pages/*.html")
 	if err != nil {
 		return nil, err
 	}
 
 	for _, page := range pages {
 		name := filepath.Base(page) // e.g. home.html
-		// parse base template
-		ts, err := template.New(name).Funcs(functions).ParseFiles("./ui/html/base.html")
-		if err != nil {
-			return nil, err
+		patterns := []string{
+			"html/base.html",
+			"html/partials/*.html",
+			page,
 		}
-
-		// parse all partials in terms of a Glob pattern
-		ts, err = ts.ParseGlob("./ui/html/partials/*.html")
-
-		// parse current page
-		ts, err = ts.ParseFiles(page)
+		// parse base template
+		ts, err := template.New(name).Funcs(functions).ParseFS(ui.Files, patterns...)
 		if err != nil {
 			return nil, err
 		}

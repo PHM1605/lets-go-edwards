@@ -96,3 +96,9 @@ CREATE TABLE users (
 ALTER TABLE users ADD CONSTRAINT users_uc_email UNIQUE (email);
 ```
 Test credentials for login: `abc@gmail.com` and `12345678`
+
+## Delete an User from table
+```sh
+USE snippetbox;
+DELETE FROM users WHERE email="abc@gmail.com";
+```

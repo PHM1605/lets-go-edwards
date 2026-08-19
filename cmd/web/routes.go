@@ -1,6 +1,7 @@
 package main
 
 import (
+	"lets-go-edwards/ui"
 	"net/http"
 
 	"github.com/justinas/alice"
@@ -11,16 +12,11 @@ func (app *application) routes() http.Handler {
 	mux := http.NewServeMux()
 
 	// File server for files in "./ui/static"
-	fileServer := http.FileServer(http.Dir("./ui/static"))
-
-	// Register the Fileserver as a handler
-	// NOTE: must strip off "/static" of REQUEST
-	// e.g. "/static/css/style.css" => "css/style.css"
-	// otherwise fullpath is "/static/static/css/style.css" which is wrong
-	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
+	mux.Handle("GET /static/", http.FileServerFS(ui.Files))
 
 	// New Middleware for Session handling
-	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf)
+	// app.authenticate: middleware to 1/ check Session for UserID 2/ if UserID in DB => add {<isAuthenticatedContextKey>: true} to Context
+	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf, app.authenticate)
 
 	// Public routes
 	mux.Handle("GET /{$}", dynamic.ThenFunc(app.home))
