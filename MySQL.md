@@ -102,3 +102,20 @@ Test credentials for login: `abc@gmail.com` and `12345678`
 USE snippetbox;
 DELETE FROM users WHERE email="abc@gmail.com";
 ```
+
+## DB for Integration test
+Create mock DB:
+```sh
+CREATE DATABASE test_snippetbox CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; 
+```
+Create test_user:
+```sh
+CREATE USER 'test_web'@'localhost';
+GRANT CREATE, DROP, ALTER, INDEX, SELECT, INSERT, UPDATE, DELETE ON test_snippetbox.* TO 'test_web'@'localhost';
+ALTER USER 'test_web'@'localhost' IDENTIFIED BY 'pass';
+```
+To login as that user:
+```sh
+mysql -u test_web -p
+```
+Then enter the password.\

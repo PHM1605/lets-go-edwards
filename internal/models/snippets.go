@@ -6,6 +6,13 @@ import (
 	"time"
 )
 
+// Create interface so that we can use both true DB wrapper AND mock DB wrapper
+type SnippetModelInterface interface {
+	Insert(title string, content string, expires int) (int, error)
+	Get(id int) (Snippet, error)
+	Latest() ([]Snippet, error)
+}
+
 type Snippet struct {
 	ID      int
 	Title   string

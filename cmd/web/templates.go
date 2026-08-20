@@ -26,7 +26,12 @@ type templateData struct {
 // 3/ use "template.New("xxx").Funcs(<FuncMap>)"
 // 4/ use that function in Template with {{humanDate .Created}} or PIPELINING {{.Created | humanDate}}
 func humanDate(t time.Time) string {
-	return t.Format("02 Jan 2006 at 15:04")
+	// if Time has Zero value
+	if t.IsZero() {
+		return ""
+	}
+
+	return t.UTC().Format("02 Jan 2006 at 15:04")
 }
 
 var functions = template.FuncMap{

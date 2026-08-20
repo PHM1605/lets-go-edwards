@@ -14,6 +14,9 @@ func (app *application) routes() http.Handler {
 	// File server for files in "./ui/static"
 	mux.Handle("GET /static/", http.FileServerFS(ui.Files))
 
+	// Health check route
+	mux.HandleFunc("GET /ping", ping)
+
 	// New Middleware for Session handling
 	// app.authenticate: middleware to 1/ check Session for UserID 2/ if UserID in DB => add {<isAuthenticatedContextKey>: true} to Context
 	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf, app.authenticate)

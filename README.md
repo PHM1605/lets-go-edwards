@@ -132,3 +132,61 @@ cp -r ./tls /tmp/
 cd /tmp/
 ./web
 ```
+
+## Go Test
+```sh
+go test -v ./cmd/web
+```
+To run all tests files (`*_test.go`) in current project directory: `go test ./...`\
+To choose which test to run: `go test -v -run="^TestPing$" ./cmd/web/`\
+To run sub-test: `go test -v -run="^TestHumanDate$/^UTC$" ./cmd/web`\
+To skip a test (run the rest): `go test -v -skip="^TestHumanDate$" ./cmd/web/`\
+To specify how many times you want to run each test before caching: `go test -count=1 ./cmd/web`\
+To clean test cache: `go clean -testcache`\
+To exit test immediately after 1st failure `Errorf()`: `go test -failfast ./cmd/web`\
+To run tests in parallel: 
+```sh
+func TestPing(t *testing.T) {
+  t.Parallel()
+  ...
+}
+```
+We can specify how many goroutines to run in parallel: `go test -parallel=4 ./...`\
+To detect race condition in BOTH code & test: `go test -race ./cmd/web/`
+
+## Integration test
+**Definition**: use a "dev-DB" to test full flow.\
+**Setup**: like in `MySQL.md`.\
+In this code base, we check if `models.UserModel.Exists()` is working correctly.\
+Run 
+```sh
+go test -v ./internal/models
+```
+NOTE: to skip integration test (notice the `testing.Short()` part in `users_test.go`)
+```sh
+go test -v -short ./...
+```
+
+## Profiling test coverage
+```sh
+go test -cover ./...
+```
+We can export to a file
+```sh
+go test -coverprofile=profile.out ./...
+```
+Then view the coverage of that file:
+```sh
+go tool cover -func=profile.out
+go tool cover -html=profile.out
+```
+To view in deeper details, see also **how many times each statement is executed during the test** (the brighter green the more that statement is executed)
+```sh
+go test -covermode=count -coverprofile=profile.out ./...
+go tool cover -html=profile.out
+```
+If some tests are in parallel (not in our repos):
+```sh
+go test -covermode=atomic -coverprofile=profile.out ./...
+go tool cover -html=profile.out
+```

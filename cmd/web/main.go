@@ -21,8 +21,8 @@ import (
 // Next step: put all Handlers as Methods of this struct; so that "logger"/"snippets" are visible to them
 type application struct {
 	logger         *slog.Logger
-	snippets       *models.SnippetModel
-	users          *models.UserModel
+	snippets       models.SnippetModelInterface // so that we can use either true DB wrapper OR mock DB wrapper
+	users          models.UserModelInterface    // so that we can use either true DB wrapper OR mock DB wrapper
 	templateCache  map[string]*template.Template
 	formDecoder    *form.Decoder
 	sessionManager *scs.SessionManager
