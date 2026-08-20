@@ -1,7 +1,7 @@
 {{define "title"}}Create a New Snippet{{end}}
 
 {{define "main"}}
-<form action='/snippet/create' method='POST'>
+<form action="/snippet/create" method="POST">
   <!-- NOTE: CSRF token; only POST request from this template will have this field -->
   <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
   <div>

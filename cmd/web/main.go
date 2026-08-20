@@ -20,6 +20,7 @@ import (
 // Dependency injection - to make "logger" global
 // Next step: put all Handlers as Methods of this struct; so that "logger"/"snippets" are visible to them
 type application struct {
+	debug          bool
 	logger         *slog.Logger
 	snippets       models.SnippetModelInterface // so that we can use either true DB wrapper OR mock DB wrapper
 	users          models.UserModelInterface    // so that we can use either true DB wrapper OR mock DB wrapper
@@ -48,6 +49,7 @@ func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address") // NOTE: this is a Pointer
 	// Command line flag for MySQL connection string
 	dsn := flag.String("dsn", "abc:1234@/snippetbox?parseTime=true", "MySQL data source name")
+	debug := flag.Bool("debug", false, "Enable debug mode")
 	flag.Parse()
 
 	// Structure logger (instead of standard log)
@@ -84,6 +86,7 @@ func main() {
 	sessionManager.Cookie.Secure = true
 
 	app := &application{
+		debug:          *debug,
 		logger:         logger,
 		snippets:       &models.SnippetModel{DB: db},
 		users:          &models.UserModel{DB: db},

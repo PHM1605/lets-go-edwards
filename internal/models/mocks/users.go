@@ -1,9 +1,27 @@
 package mocks
 
-import "lets-go-edwards/internal/models"
+import (
+	"lets-go-edwards/internal/models"
+	"time"
+)
 
 // Dummy DB wrapper
 type UserModel struct{}
+
+// Get a mock User from non-existent DB
+func (m *UserModel) Get(id int) (models.User, error) {
+	if id == 1 {
+		u := models.User{
+			ID:      1,
+			Name:    "Alice",
+			Email:   "alice@example.com",
+			Created: time.Now(),
+		}
+		return u, nil
+	}
+	// ID not exists
+	return models.User{}, models.ErrNoRecord
+}
 
 func (m *UserModel) Insert(name, email, password string) error {
 	switch email {
@@ -30,4 +48,15 @@ func (m *UserModel) Exists(id int) (bool, error) {
 	default:
 		return false, nil
 	}
+}
+
+func (m *UserModel) PasswordUpdate(id int, currentPassword, newPassword string) error {
+	if id == 1 {
+		if currentPassword != "pa$$word" {
+			return models.ErrInvalidCredentials
+		}
+		return nil
+	}
+
+	return models.ErrNoRecord
 }

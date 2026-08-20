@@ -226,3 +226,37 @@ func TestUserSignup(t *testing.T) {
 		})
 	}
 }
+
+// Check what happens if Client accesses `GET /snippet/create`
+// Authenticated: show the Create Snippet Form
+// Unauthenticated: redirect to the Login Form
+func TestSnippetCreate(t *testing.T) {
+	app := newTestApplication(t)
+	ts := newTestServer(t, app.routes())
+	defer ts.Close()
+
+	t.Run("Unauthenticated", func(t *testing.T) {
+		code, headers, _ := ts.get(t, "/snippet/create")
+
+		assert.Equal(t, code, http.StatusSeeOther)              // status is "Redirect"
+		assert.Equal(t, headers.Get("Location"), "/user/login") // redirect to "login page"
+	})
+
+	t.Run("Authenticated", func(t *testing.T) {
+		// Make a GET to get CSRFToken from Login form
+		_, _, body := ts.get(t, "/user/login")
+		csrfToken := extractCSRFToken(t, body)
+		// Make a POST to login
+		form := url.Values{} // map from "string" to "[]string"
+		form.Add("email", "alice@example.com")
+		form.Add("password", "pa$$word")
+		form.Add("csrf_token", csrfToken)
+		ts.postForm(t, "/user/login", form)
+
+		// Now we can GET the "/snippet/create" form
+		code, _, body := ts.get(t, "/snippet/create")
+
+		assert.Equal(t, code, http.StatusOK)
+		assert.StringContains(t, body, `<form action="/snippet/create" method="POST">`)
+	})
+}

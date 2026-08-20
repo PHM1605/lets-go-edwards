@@ -18,6 +18,7 @@ type templateData struct {
 	Flash           string
 	IsAuthenticated bool   // is current User authenticated?
 	CSRFToken       string // for CSRF security
+	User            models.User
 }
 
 // NOTE: to pass Functions to Template

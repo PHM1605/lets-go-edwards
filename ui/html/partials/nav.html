@@ -2,6 +2,7 @@
 <nav>
   <div>
     <a href="/">Home</a>
+    <a href="/about">About</a>
     <!-- Toggle link based on Authentication status -->
     {{if .IsAuthenticated}}
       <a href="/snippet/create">Create snippet</a>
@@ -9,6 +10,7 @@
   </div>
   <div>
     {{if .IsAuthenticated}}
+      <a href="/account/view">Account</a>
       <form action="/user/logout" method="POST">
         <!-- NOTE: CSRF token; only POST request from this template will have this field -->
         <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">

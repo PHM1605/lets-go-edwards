@@ -15,6 +15,7 @@ To reach a `static` asset: `curl -i localhost:4000/static/xxx.png`.
 ```sh
 go run ./cmd/web -addr=":4000"
 ```
+
 We can run with environment variables too:
 ```sh
 export SNIPPETBOX_ADDR=":9999"
@@ -189,4 +190,10 @@ If some tests are in parallel (not in our repos):
 ```sh
 go test -covermode=atomic -coverprofile=profile.out ./...
 go tool cover -html=profile.out
+```
+
+## Exercise: test the application in `debug` mode
+We deliberately make an error by not passing `parseTime=true`
+```sh
+go run ./cmd/web/ -debug -dsn=abc:1234@/snippetbox
 ```
